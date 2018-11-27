@@ -29,9 +29,15 @@ void PrintMatrixInFile(FlexMatrix &table, ofstream &fOut)
 	{
 		for (size_t j = 0; j < table.size(); ++j)
 		{
-			for (it = table[j][i].begin(); it != table[j][i].end(); ++it)
+			if (table[j][i].empty())
 			{
-				fOut << *it << " ";
+				fOut << -1 << " ";
+			} else
+			{
+				for (it = table[j][i].begin(); it != table[j][i].end(); ++it)
+				{
+					fOut << *it << " ";
+				}
 			}
 		}
 		fOut << endl;
