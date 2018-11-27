@@ -25,31 +25,59 @@ void PrintMatrixInFile(FlexMatrix &table, ofstream &fOut)
 {
 	Cell::iterator it;
 
-	for (int i = 0; i < table.size(); ++i)
+	for (size_t i = 0; i < table[i].size(); ++i)
 	{
-		for (int j = 0; j < table[i].size(); ++j)
+		for (size_t j = 0; j < table.size(); ++j)
 		{
-			for (it = table[i][j].begin(); it != table[i][j].end(); ++it)
+			for (it = table[j][i].begin(); it != table[j][i].end(); ++it)
 			{
-				cout << "!" << *it << "!  ";
+				fOut << *it << " ";
 			}
 		}
-		cout << endl;
+		fOut << endl;
 	}
 }
 
-void PrintAutomateInfo(FlexMatrix &table, ofstream &fOut, const AutomateInfo info)
+vector<Cell> GetNewFinishStates(const AutomateInfo info, vector<Cell> complexStateAlias)
 {
-	fOut << info.signalsNumber;
-	fOut << table.size();
-	fOut << info.finishStatesNumber;
-	
-	for (int i = 0; i < info.finishStatesNumber; i++)
+	vector<Cell> resultFinishStates;
+
+	for (size_t i = 0; i < complexStateAlias.size(); i++)
 	{
-		fOut << info.finalyStatesArr[i];
+		for (const int &info : info.finalyStatesArr)
+		{
+			if (complexStateAlias[i].find(info) != complexStateAlias[i].end())
+			{
+				//если есть это конечное состояние в сете
+				if (find(resultFinishStates.begin(), resultFinishStates.end(), complexStateAlias[i]) == resultFinishStates.end())
+				{
+					resultFinishStates.push_back(complexStateAlias[i]);
+				}
+			}
+		}
 	}
 
+	return resultFinishStates;
+}
 
+void PrintAutomateInfo(FlexMatrix &table, ofstream &fOut, const AutomateInfo info, vector<Cell> complexStateAlias)
+{
+	fOut << info.signalsNumber << endl;
+	fOut << table.size() << endl;
+	vector<Cell> newFinishStates = GetNewFinishStates(info, complexStateAlias);
+	fOut << newFinishStates.size() << endl;
+
+	Cell::iterator it;
+	for (Cell &state : newFinishStates)
+	{
+		for (it = state.begin(); it != state.end(); ++it)
+		{
+			fOut << *it << " ";
+		}
+		fOut << " ";
+	} 
+
+	fOut << endl;
 }
 
 void InitializeTable(FlexMatrix &table, const AutomateInfo info, ifstream &fIn)
@@ -92,7 +120,6 @@ queue<Cell> InitializeQueue()
 vector<Cell> GetStates(FlexMatrix &table, Cell currentState)
 {
 	Cell::iterator it;
-	//функция возвращает вектор состояний (сливает состояния, если в currentState > 1 элемента, и 
 	vector <Cell> resultStates;
 	vector <Cell> tempStates;
 
@@ -103,7 +130,7 @@ vector<Cell> GetStates(FlexMatrix &table, Cell currentState)
 	} else
 	{
 		bool itFirstState = true;
-		//склеиваем состояния
+
 		for (it = currentState.begin(); it != currentState.end(); ++it)
 		{
 			if (itFirstState)
@@ -116,7 +143,6 @@ vector<Cell> GetStates(FlexMatrix &table, Cell currentState)
 
 				for (size_t i = 0; i < resultStates.size(); i++)
 				{
-					//идем по каждому из множеств в tempStates и смотрим, есть ли элемент в нем
 					Cell oneSet = resultStates[i];
 					Cell twoSet = tempStates[i];
 					Cell resultSet;
@@ -125,7 +151,6 @@ vector<Cell> GetStates(FlexMatrix &table, Cell currentState)
 					resultSet.insert(twoSet.begin(), twoSet.end());
 
 					resultStates[i] = resultSet;
-
 				}
 
 			}
