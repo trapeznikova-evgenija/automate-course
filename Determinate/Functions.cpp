@@ -158,10 +158,56 @@ vector<Cell> GetStates(FlexMatrix &table, Cell currentState)
 
 					resultStates[i] = resultSet;
 				}
-
 			}
 		}
 	}
 	
 	return resultStates;
+}
+
+void PrintSetElement(ofstream &dotFileName, Cell complexStateAlias)
+{
+	Cell::iterator it;
+
+	int counter = 0;
+	dotFileName << "\"";
+	for (it = complexStateAlias.begin(); it != complexStateAlias.end(); ++it)
+	{
+		counter++;
+		dotFileName << *it;
+		if (complexStateAlias.size() > 1 && counter != complexStateAlias.size())
+		{
+			dotFileName << ", ";
+		}
+	}
+	dotFileName << "\"";
+}
+
+void CreateVisualizationDotFile(ofstream &dotFileName, FlexMatrix determinateMatrix, vector<Cell> complexStateAlias)
+{
+	dotFileName << "digraph DetermAutomat {" << endl;
+
+	for (Cell &state : complexStateAlias)
+	{
+		PrintSetElement(dotFileName, state);
+		dotFileName << endl;
+	}
+
+	for (size_t i = 0; i < determinateMatrix.size(); i++)
+	{
+		for (size_t j = 0; j < determinateMatrix[i].size(); j++)
+		{
+			if (determinateMatrix[i][j].begin() != determinateMatrix[i][j].end())
+			{
+				dotFileName << "	";
+				PrintSetElement(dotFileName, complexStateAlias[i]);
+				dotFileName << "->";
+				PrintSetElement(dotFileName, determinateMatrix[i][j]);
+				dotFileName << " [label=" << j << ']' << endl;
+
+			}
+		}
+	} 
+	dotFileName << "}";
+	dotFileName.close();
 }

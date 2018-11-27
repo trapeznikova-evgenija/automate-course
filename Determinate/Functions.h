@@ -24,3 +24,4 @@ void PrintMatrixInFile(FlexMatrix &table, std::ofstream &fOut);
 void PrintAutomateInfo(FlexMatrix &table, std::ofstream &fOut, const AutomateInfo info, std::vector<Cell> complexStateAlias);
 std::queue<Cell> InitializeQueue();
 std::vector<Cell> GetStates(FlexMatrix &table, Cell currentStatel);
+void CreateVisualizationDotFile(std::ofstream &dotFileName, FlexMatrix determinateMatrix, std::vector<Cell> complexStateAlias);
