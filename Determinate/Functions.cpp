@@ -183,13 +183,39 @@ void PrintSetElement(ofstream &dotFileName, Cell complexStateAlias)
 	dotFileName << "\"";
 }
 
-void CreateVisualizationDotFile(ofstream &dotFileName, FlexMatrix determinateMatrix, vector<Cell> complexStateAlias)
+void MarkEndState(ofstream &dotFileName, Cell state, Cell finishState)
 {
+	Cell intersectionState;
+	set_intersection(state.begin(), state.end(), finishState.begin(), finishState.end(), std::inserter(intersectionState, intersectionState.begin()));
+	
+	if (intersectionState.begin() != intersectionState.end())
+	{
+		dotFileName << " [shape=box]";
+	}
+}
+
+Cell CreateSetFromArr(const AutomateInfo info)
+{
+	Cell finishState;
+
+	for (size_t i = 0; i < info.finalyStatesArr.size(); i++)
+	{
+		finishState.insert(info.finalyStatesArr[i]);
+	}
+
+	return finishState;
+}
+
+void CreateVisualizationDotFile(ofstream &dotFileName, FlexMatrix determinateMatrix, vector<Cell> complexStateAlias, const AutomateInfo info)
+{
+	Cell finishStateSet = CreateSetFromArr(info);
+
 	dotFileName << "digraph DetermAutomat {" << endl;
 
 	for (Cell &state : complexStateAlias)
 	{
 		PrintSetElement(dotFileName, state);
+		MarkEndState(dotFileName, state, finishStateSet);
 		dotFileName << endl;
 	}
 
